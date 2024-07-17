@@ -120,4 +120,32 @@ const logoutUser = async (req,res)=>{
     }
   };
 
-  module.exports = {login, loger, addUser, logoutUser, getAllUser, getAllAgent, updateSender, pinVerification}
+  //**************** */ All Admin related routess ***************** ///
+
+  // get all user and agent
+  const getAllUandA = async(req,res)=>{
+    const usersCollection = await getUsersCollection();
+    const allUandA = await usersCollection.find({
+      $or: [
+        { role: 'agent' },
+        { role: 'user' }
+      ]
+    },
+      {
+          projection: { pinNumber: 0  }
+      }).toArray();
+      res.json(allUandA)
+  }
+
+      //update send amount 
+      const updateAccount = async(req,res)=>{
+        const usersCollection = await getUsersCollection();
+        const { email, account } = req.body;
+        const filter = { email};
+        const updateDoc = {  $set: { account: account }};
+      const result = await usersCollection.updateOne(filter, updateDoc);
+      res.json({ message: 'Account Status Updated' });
+      }
+  
+
+  module.exports = {login, loger, addUser, logoutUser, getAllUser, getAllAgent, updateSender, pinVerification, getAllUandA , updateAccount}
