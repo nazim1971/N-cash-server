@@ -10,12 +10,12 @@ router.post('/login', login);
 router.post('/addUser', addUser);
 router.post('/logout', logoutUser);
 
-router.get('/loger', loger );
+router.get('/loger', verifyToken, loger );
 router.get('/allUserForSend', verifyToken, getAllUser);
-router.get('/allAgent', getAllAgent);
+router.get('/allAgent', verifyToken,getAllAgent);
 
-router.patch('/updateSender', updateSender)
+router.patch('/updateSender', verifyToken, updateSender)
 
-router.post('/checkPin', pinVerification)
+router.post('/checkPin', verifyToken , pinVerification)
 
 module.exports = router

@@ -20,9 +20,18 @@ const getsendTransCollection = async () => {
   return sendTransCollection;
 };
 
+const getCashOutCollection = async () => {
+  if (!sendTransCollection) {
+    const db = await connectDB();
+    cashoutCollection = db.collection('cashout');
+  }
+  return cashoutCollection;
+};
+
 
 
 module.exports = {
     getUsersCollection,
-    getsendTransCollection
+    getsendTransCollection,
+    getCashOutCollection
   };

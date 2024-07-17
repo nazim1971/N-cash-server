@@ -52,12 +52,13 @@ const corsOptions = {
 
 
 const userRouter = require('./routes/userRoute');
-
+const cashoutRouter = require('./routes/cashoutRoute')
 const transRouter = require('./routes/transRoute');
 
 // user route
 app.use('/v1', userRouter)
 app.use('/v1', transRouter)
+app.use('/v1', cashoutRouter)
 
 app.get('/', (req, res)=>{
     res.send('MFS Is On Fire')
