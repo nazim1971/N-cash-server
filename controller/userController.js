@@ -137,15 +137,22 @@ const logoutUser = async (req,res)=>{
       res.json(allUandA)
   }
 
-      //update send amount 
-      const updateAccount = async(req,res)=>{
+      //update  account and status
+      const updateAccount = async (req, res) => {
         const usersCollection = await getUsersCollection();
-        const { email, account } = req.body;
-        const filter = { email};
-        const updateDoc = {  $set: { account: account }};
-      const result = await usersCollection.updateOne(filter, updateDoc);
-      res.json({ message: 'Account Status Updated' });
-      }
+        const { email, account, status } = req.body;
+        const filter = { email };
+        const updateDoc = {};
+       if (account) { updateDoc.$set = { ...updateDoc.$set, account };}
+        if (status) { updateDoc.$set = { ...updateDoc.$set, status }; }
+      
+        if (!updateDoc.$set) {
+          return res.status(400).json({ message: 'No update field provided' });
+        }
+      
+        const result = await usersCollection.updateOne(filter, updateDoc);
+        res.json({ message: 'User updated successfully', result });
+      };
   
 
   module.exports = {login, loger, addUser, logoutUser, getAllUser, getAllAgent, updateSender, pinVerification, getAllUandA , updateAccount}
