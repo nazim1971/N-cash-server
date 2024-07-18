@@ -123,19 +123,34 @@ const logoutUser = async (req,res)=>{
   //**************** */ All Admin related routess ***************** ///
 
   // get all user and agent
-  const getAllUandA = async(req,res)=>{
+  const getAllUandA = async (req, res) => {
     const usersCollection = await getUsersCollection();
-    const allUandA = await usersCollection.find({
-      $or: [
-        { role: 'agent' },
-        { role: 'user' }
-      ]
-    },
-      {
-          projection: { pinNumber: 0  }
+    const { name } = req.query;
+    
+    // Base search criteria
+    let searchCriteria = { $or: [ { role: 'agent' }, { role: 'user' } ] };
+    
+    // Add name search criteria if provided
+    if (name) {
+      searchCriteria = {
+        $and: [
+          searchCriteria,
+          { name: { $regex: name, $options: 'i' } }
+        ]
+      };
+    }
+    
+    try {
+      const allUandA = await usersCollection.find(searchCriteria, {
+        projection: { pinNumber: 0 }
       }).toArray();
-      res.json(allUandA)
-  }
+      
+      res.json(allUandA);
+    } catch (error) {
+      console.error('Error fetching users and agents:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  };
 
       //update  account and status
       const updateAccount = async (req, res) => {
@@ -154,5 +169,6 @@ const logoutUser = async (req,res)=>{
         res.json({ message: 'User updated successfully', result });
       };
   
+   
 
   module.exports = {login, loger, addUser, logoutUser, getAllUser, getAllAgent, updateSender, pinVerification, getAllUandA , updateAccount}

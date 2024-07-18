@@ -8,4 +8,11 @@ const sendTrans = async(req,res)=>{
     res.json(result);
   }
 
-  module.exports = {sendTrans}
+     // get all transaction history
+     const allTransHis = async(req,res)=>{
+      const sendTransCollection = await getsendTransCollection()
+      const result = await sendTransCollection.find({status: 'success'}).toArray()
+      res.json(result)
+     }
+
+  module.exports = {sendTrans, allTransHis}
