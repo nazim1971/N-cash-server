@@ -43,7 +43,7 @@ const login = async (req, res) => {
       // Generate JWT token
       const { pinNumber: userPinNumber, ...userWithoutPinNumber } = user;
       const userEmail = user.email;
-      const token = jwt.sign({ email: userEmail }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' });
+      const token = jwt.sign({ email: userEmail }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '7d' });
      res.cookie('token', token, { httpOnly: true }).json({ Status: "Success", User: userWithoutPinNumber });
     } catch (err) { res.status(500).json({ Error: "Login error in server" }); }
   };
@@ -126,10 +126,8 @@ const logoutUser = async (req,res)=>{
   const getAllUandA = async (req, res) => {
     const usersCollection = await getUsersCollection();
     const { name } = req.query;
-    
     // Base search criteria
     let searchCriteria = { $or: [ { role: 'agent' }, { role: 'user' } ] };
-    
     // Add name search criteria if provided
     if (name) {
       searchCriteria = {
@@ -139,7 +137,6 @@ const logoutUser = async (req,res)=>{
         ]
       };
     }
-    
     try {
       const allUandA = await usersCollection.find(searchCriteria, {
         projection: { pinNumber: 0 }
