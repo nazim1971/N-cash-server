@@ -1,3 +1,4 @@
+const { ObjectId } = require("mongodb");
 const { getsendTransCollection } = require("../collection");
 
 
@@ -32,7 +33,7 @@ const sendTrans = async(req,res)=>{
       const email = req.query.email;
       const result = await sendTransCollection.find({status: 'success', $or: [
          { senderEmail: email },
-         { receiverEmail: email }
+         { reciverEmail: email }
      ] }).toArray();
       res.json(result)
      }
@@ -41,9 +42,9 @@ const sendTrans = async(req,res)=>{
          //update send amount 
     const updateStatus = async(req,res)=>{
       const sendTransCollection = await getsendTransCollection();
-      const { email, status } = req.body;
-      const filter = { email};
-      const updateDoc = {  $set: { status: status }};
+      const { id, status } = req.body;
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {  $set: { status }};
     const result = await sendTransCollection.updateOne(filter, updateDoc);
     res.json({ message: 'Update Status' });
     }

@@ -43,6 +43,7 @@ const login = async (req, res) => {
       // Generate JWT token
       const { pinNumber: userPinNumber, ...userWithoutPinNumber } = user;
       const userEmail = user.email;
+      if(user?.account === "block") return res.json({Status: "Account has been blocked"})
       const token = jwt.sign({ email: userEmail }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '7d' });
      res.cookie('token', token, { httpOnly: true }).json({ Status: "Success", User: userWithoutPinNumber });
     } catch (err) { res.status(500).json({ Error: "Login error in server" }); }
@@ -154,9 +155,24 @@ const logoutUser = async (req,res)=>{
         const usersCollection = await getUsersCollection();
         const { email, account, status } = req.body;
         const filter = { email };
-        const updateDoc = {};
-       if (account) { updateDoc.$set = { ...updateDoc.$set, account };}
-        if (status) { updateDoc.$set = { ...updateDoc.$set, status }; }
+        const updateDoc = {$set: {}};
+       if (account) {  updateDoc.$set.account = account;}
+
+         if (status) {
+    updateDoc.$set.status = status;
+
+    // Fetch the user document to check the current status and role
+    const user = await usersCollection.findOne(filter);
+
+    // Only add amount if status is changing from 'pending' to 'approved'
+    if (user && user.status === 'pending' && status === 'approved') {
+      if (user.role === 'user') {
+        updateDoc.$inc = { amount: 40 };
+      } else if (user.role === 'agent') {
+        updateDoc.$inc = { amount: 10000 };
+      }
+    }
+  }
       
         if (!updateDoc.$set) {
           return res.status(400).json({ message: 'No update field provided' });
