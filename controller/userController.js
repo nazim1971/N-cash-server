@@ -45,7 +45,11 @@ const login = async (req, res) => {
       const userEmail = user.email;
       if(user?.account === "block") return res.json({Status: "Account has been blocked"})
       const token = jwt.sign({ email: userEmail }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '7d' });
-     res.cookie('token', token, { httpOnly: true }).json({ Status: "Success", User: userWithoutPinNumber });
+     res.cookie('token', token,{
+      httpOnly: true, // Prevents JavaScript from accessing the cookie
+      secure: process.env.NODE_ENV === 'production', // Ensures the cookie is sent only over HTTPS
+      sameSite: 'Strict', // CSRF protection
+    }).json({ Status: "Success", User: userWithoutPinNumber });
     } catch (err) { res.status(500).json({ Error: "Login error in server" }); }
   };
 
