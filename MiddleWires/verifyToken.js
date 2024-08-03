@@ -8,6 +8,7 @@ app.use(cookieParser()); // Initialize cookie-parser middleware
 
 const verifyToken = (req, res, next) => {
   const token = req.cookies?.token;
+  console.log('Received token:', token);
   if (!token) return res.status(401).send({ message: 'Unauthorized access' });
 
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {

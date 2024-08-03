@@ -48,7 +48,7 @@ const login = async (req, res) => {
      res.cookie('token', token,{
       httpOnly: true, // Prevents JavaScript from accessing the cookie
       secure: process.env.NODE_ENV === 'production', // Ensures the cookie is sent only over HTTPS
-      sameSite: 'Strict', // CSRF protection
+      sameSite: process.env.NODE_ENV === 'production'? 'none' : 'strict' 
     }).json({ Status: "Success", User: userWithoutPinNumber });
     } catch (err) { res.status(500).json({ Error: "Login error in server" }); }
   };
@@ -56,9 +56,11 @@ const login = async (req, res) => {
         // logout user
 const logoutUser = async (req,res)=>{
   res.clearCookie("token",{
-      secure: true,
-      sameSite: "none"
-  }).json({Status: "Success"})}
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production", 
+    sameSite: process.env.NODE_ENV === 'production'? 'none' : 'strict' ,
+    maxAge: 0,
+  },{withCredentials: true} ).json({Status: "Success"})}
  
   // get all user 
    const loger = async(req,res)=>{
